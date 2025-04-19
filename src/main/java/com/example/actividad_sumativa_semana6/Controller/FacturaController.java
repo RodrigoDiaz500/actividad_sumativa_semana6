@@ -8,7 +8,7 @@ import java.util.List;
 
 import com.example.actividad_sumativa_semana6.Service.FacturaService;
 import com.example.actividad_sumativa_semana6.Model.Factura;
-import com.example.actividad_sumativa_semana6.Model.FacturaRequest;  // Importar el DTO
+import com.example.actividad_sumativa_semana6.Model.FacturaRequest; // Importar el DTO
 import com.example.actividad_sumativa_semana6.Model.Servicio;
 
 @RestController
@@ -29,10 +29,32 @@ public class FacturaController {
         return facturaService.obtenerServicios();
     }
 
+    @PutMapping("/servicios/{id}")
+    public ResponseEntity<Servicio> actualizarServicio(@PathVariable Long id, @RequestBody Servicio servicioActualizado) {
+        return facturaService.obtenerServicioPorId(id)
+            .map(servicioExistente -> {
+                servicioExistente.setNombre(servicioActualizado.getNombre());
+                servicioExistente.setDescripcion(servicioActualizado.getDescripcion());
+                servicioExistente.setPrecio(servicioActualizado.getPrecio());
+                Servicio servicioGuardado = facturaService.crearServicio(servicioExistente);
+                return ResponseEntity.ok(servicioGuardado);
+            })
+            .orElse(ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/servicios/{id}")
+    public ResponseEntity<Void> eliminarServicio(@PathVariable Long id) {
+        if (facturaService.eliminarServicio(id)) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     // Facturas
     @PostMapping("/facturas")
     public Factura crearFactura(@RequestBody FacturaRequest facturaRequest) {
-        return facturaService.crearFactura(facturaRequest.getServicios());  // Usar el DTO para extraer los servicios
+        return facturaService.crearFactura(facturaRequest.getServicios()); // Usar el DTO para extraer los servicios
     }
 
     @GetMapping("/facturas")

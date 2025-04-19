@@ -32,6 +32,18 @@ public class FacturaService {
         return servicioRepository.findAll();
     }
 
+    public Optional<Servicio> obtenerServicioPorId(Long id) {
+        return servicioRepository.findById(id);
+    }
+    
+    public boolean eliminarServicio(Long id) {
+        if (servicioRepository.existsById(id)) {
+            servicioRepository.deleteById(id);
+            return true;
+        }
+        return false;
+    }
+
     @Transactional
     public Factura crearFactura(List<Long> idsServicios) {
         if (idsServicios == null || idsServicios.isEmpty()) {
